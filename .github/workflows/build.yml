@@ -1,0 +1,28 @@
+name: Build EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -U pyinstaller pymobiledevice3 pillow pillow-heif
+      - name: Build
+        run: >
+          pyinstaller --onefile --windowed --name iPhoneTransfer
+          --collect-all pymobiledevice3
+          --collect-all pillow_heif
+          iphone_transfer.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iPhoneTransfer
+          path: dist/iPhoneTransfer.exe
